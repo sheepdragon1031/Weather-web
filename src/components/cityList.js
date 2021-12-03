@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -7,6 +7,7 @@ import Avatar from '@mui/material/Avatar';
 
 import Box from '@mui/material/Box';
 import ListItemButton from '@mui/material/ListItemButton';
+import axios from "axios"
 
 const stringToColor = (string) => {
     let hash = 0;
@@ -30,21 +31,31 @@ const  stringAvatar = (name) => {
              `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`:`${name.split(' ')[0][0]}`,
     };
 }
-const cityList = ({fullWidth, listData, setCity, onClose}) =>{
+const cityList = ({fullWidth, listData, setCity, onClose, setWeather}) =>{
     const onClickQuery = (woeid) =>{
         setCity(woeid)
-
-        console.log(woeid);
         onClose(null)
+        axios.get(`https://www.metaweather.com/api/location/${woeid}`)
+            .then(res => {
+            const persons = res.data;
+            setWeather(persons)
+        })      
     }
-    
     return (
         <Box sx={{ width: 1 }}>
         <List sx={{ width: '100%', 
-        minWidth: fullWidth + 10, 
-        bgcolor: 'background.paper', 
-        borderRadius: '.5rem', p: 0 }} >
+            minWidth: fullWidth + 10, 
+            bgcolor: 'background.paper', 
+            borderRadius: '.5rem', p: 0 }} >
+            
             {
+                listData.length === 0 ?
+                <ListItemButton>
+                    <ListItem sx={ {px: 0}} >
+                        <ListItemText primary="Not found location" secondary="" />
+                    </ListItem>
+                </ListItemButton>
+                :
                 listData.map((val)=>{
                    return (
                     <ListItemButton key={val.woeid} onClick={ () => onClickQuery(val.woeid)}>
